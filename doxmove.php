@@ -30,8 +30,10 @@ if (substr($hfile, -2) != '.h') {
 $ctxt = file_get_contents($cfile);
 $htxt = file_get_contents($hfile);
 
+// Here we nuke certain crazy header comments (common in the STM32 libs)
 $ctxt = preg_replace("/\/\*\*\s+\*\*\*/s", "/*\n", $ctxt);
 
+// Find all dox
 preg_match_all('/(\/\*\*(?:.(?!\/\*\*))*?\*\/)\s+([a-z_+0-9 ]+)\s+([a-z_+0-9]+)\s*(?=\()/si', $ctxt, $matches);
 $dox = $matches[1];
 $types = $matches[2];
@@ -56,6 +58,8 @@ for ($i = 0; $i < count($dox); $i++) {
 
 	$x0 = $x;
 	$x = preg_replace($search, $replacement, $x);
+	
+	// detect if replacement had any effect
 	if ($x != $x0) {
 		$suc[$i] = 'ok';
 	} else {
